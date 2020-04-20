@@ -42,9 +42,15 @@ def main():
     for arg in sys.argv[1:]:
         args.append(arg)
 
+    filereader = FileReader()
+
     ud_dict, review_sentences = parse_ud(args[0])
     we_model = generate_word_embeddings(review_sentences)
-    print(we_model.wv.similarity('schrijven', 'stijl'))
+    print(we_model.wv.similarity('schrijven', 'uiterlijk'))
+
+    review_dict = filereader.parse_review_data(args[1])
+    for key, value in review_dict.items():
+        print(key, value)
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,7 @@
 from os.path import normpath # to read files
 import conllu
 import json
+import csv
 
 class FileReader():
     def parse_conllu_data(self, parse_files):
@@ -16,3 +17,21 @@ class FileReader():
                         for token in token_list:
                             token_data.append((token['form'], token['upostag']))
                         output_file.write("{}   {}\n".format(token_list.metadata['sent_id'], " ".join("(%s,%s)" % tup for tup in token_data)))
+
+    def parse_review_data(self, review_file):
+        with open(review_file, 'r', encoding='Windows-1252') as data_file:
+            self.punct_list = ['.', ',', '?', ':', '(', ')', '!', "'", '`', '...', '``', "''", '"', "’", "”", "“", "’", "-",
+                          ";", "‘", "="]
+            self.review_dict = {}
+            self.review_data = csv.DictReader(data_file, delimiter=';')
+            for row in self.review_data:
+                self.token_list = []
+                self.review_sentence = row['sentence'].split()
+                for token in self.review_sentence:
+                    if token not in self.punct_list:
+                        self.token_list.append(token.lower())
+                self.review_dict[row['sentid']] = {'label1': row['label1'], 'label2': row['label2'],
+                                              'label1_2': row['label1_2'], 'label2_2': row['label2_2'],
+                                              'sentence': self.token_list, 'filename': row['filename']}
+
+        return self.review_dict
