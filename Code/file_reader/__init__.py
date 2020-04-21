@@ -23,6 +23,7 @@ class FileReader():
             self.punct_list = ['.', ',', '?', ':', '(', ')', '!', "'", '`', '...', '``', "''", '"', "’", "”", "“", "’", "-",
                           ";", "‘", "="]
             self.review_dict = {}
+            self.training_dict = {}
             self.review_data = csv.DictReader(data_file, delimiter=';')
             for row in self.review_data:
                 self.token_list = []
@@ -33,5 +34,9 @@ class FileReader():
                 self.review_dict[row['sentid']] = {'label1': row['label1'], 'label2': row['label2'],
                                               'label1_2': row['label1_2'], 'label2_2': row['label2_2'],
                                               'sentence': self.token_list, 'filename': row['filename']}
+                if (row['label1'] != '' and row['label2'] == '') or (row['label1'] != '' and row['label2'] == ''):
+                    self.training_dict[row['sentid']] = {'label1': row['label1'], 'label2': row['label2'],
+                                              'label1_2': row['label1_2'], 'label2_2': row['label2_2'],
+                                              'sentence': self.token_list, 'filename': row['filename']}
 
-        return self.review_dict
+        return self.review_dict, self.training_dict
