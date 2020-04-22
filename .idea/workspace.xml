@@ -19,10 +19,8 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="adbcaa91-c654-4c5b-8733-7ac3a65835ec" name="Default Changelist" comment="Review data can be loaded in and has initial processing">
+    <list default="true" id="adbcaa91-c654-4c5b-8733-7ac3a65835ec" name="Default Changelist" comment="Reviews used for classification filtered out.&#10;Created a function for the generation of the feature lexicon.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Code/classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code/classifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Code/file_reader/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code/file_reader/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +84,8 @@
       <updated>1587134313887</updated>
       <workItem from="1587134314977" duration="1005000" />
       <workItem from="1587391554174" duration="3421000" />
-      <workItem from="1587453554183" duration="8307000" />
+      <workItem from="1587453554183" duration="8976000" />
+      <workItem from="1587556104908" duration="1295000" />
     </task>
     <task id="LOCAL-00001" summary="Uploading code">
       <created>1587134518422</created>
@@ -109,7 +108,14 @@
       <option name="project" value="LOCAL" />
       <updated>1587394775497</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Reviews used for classification filtered out.&#10;Created a function for the generation of the feature lexicon.">
+      <created>1587482237395</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1587482237395</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -131,7 +137,8 @@
     <MESSAGE value="Uploading code" />
     <MESSAGE value="Added gitignore to ignore big files" />
     <MESSAGE value="Review data can be loaded in and has initial processing" />
-    <option name="LAST_COMMIT_MESSAGE" value="Review data can be loaded in and has initial processing" />
+    <MESSAGE value="Reviews used for classification filtered out.&#10;Created a function for the generation of the feature lexicon." />
+    <option name="LAST_COMMIT_MESSAGE" value="Reviews used for classification filtered out.&#10;Created a function for the generation of the feature lexicon." />
   </component>
   <component name="WindowStateProjectService">
     <state x="235" y="350" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1587394195796">
@@ -142,30 +149,30 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="739" y="262" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1587134456470" />
-    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1587480931072">
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1587495466920">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1587480931072" />
-    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1587480931072">
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1587495466920" />
+    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1587495466920">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1587480931072" />
-    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1587480931072">
+    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1587495466920" />
+    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1587495466919">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1587480931072" />
-    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1587480931072">
+    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1587495466919" />
+    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1587495466920">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587480931072" />
+    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1587495466920" />
     <state x="461" y="165" key="SettingsEditor" timestamp="1587134433103">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1587134433103" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1587394784414">
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1587482249694">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1587394784414" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1587482249694" />
     <state x="659" y="308" key="git4idea.merge.GitPullDialog" timestamp="1587134716546">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
