@@ -1,11 +1,9 @@
 import sys
-from os import listdir  # to read files
-from os.path import isfile, join, normpath # to read files
-import pathlib
-import csv
-import conllu
+import os
 from __init__ import FileReader
 from gensim.models import FastText
+import json
+from nltk.tokenize import word_tokenize
 
 
 def parse_ud(ud_file):
@@ -31,8 +29,15 @@ def parse_ud(ud_file):
 
     return line_dict, lines_list
 
-def generate_word_embeddings(lines_list):
-    we_model = FastText(lines_list, size=100, window=10, min_count=1, workers=10, sg=0, negative=5)
+def generate_word_embeddings():
+    lines_list = []
+    with open('final_output_v2.txt', 'r', encoding='utf-8') as input_file:
+        lines = input_file.readlines()
+        for line in lines:
+            line = line.rstrip()[:-1]
+            lines_list.append(line.split())
+
+    we_model = FastText(lines_list, size=100, window=10, min_count=2, workers=10, sg=0, negative=5, iter=5)
     return we_model
 
 def generate_feature_lexicon(data_dict, ud_dict, we_model):
@@ -87,7 +92,7 @@ def main():
     review_dict, data_dict = filereader.parse_review_data(args[1])
 
     print('##### Generating word embeddings')
-    we_model = generate_word_embeddings(review_sentences)
+    we_model = generate_word_embeddings()
 
     print('##### Generating feature lexicon')
     feature_lexicon = generate_feature_lexicon(data_dict, ud_dict, we_model)
