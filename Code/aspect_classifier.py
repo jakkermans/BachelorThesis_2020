@@ -43,16 +43,13 @@ def generate_word_embeddings():
             for subline in sublines:
                 lines_list.append(subline.split())
 
-    we_model = FastText(lines_list, size=100, window=10, min_count=1, workers=10, sg=0, negative=5)
+    we_model = FastText(lines_list, size=100, window=10, min_count=1, workers=10, sg=1, negative=5)
     return we_model
 
-def generate_feature_lexicon(data_dict, ud_dict, we_model):
-    feature_lexicon = {'1': {'stijl', 'taal', 'toon', 'ondertoon', 'penvoering', 'zinnetjes', 'zinnen', 'toonzetting', 'woorden', 'woordspelingen', 'woordenstroom', 'formuleringen', 'taalgebruik', 'vocabulaire', 'verteltrant', 'schrijfwijze', 'taalbeheersing', 'woordkeus', 'schrijven', 'beschrijven', 'weergeven', 'vertellen', 'benoemen', 'formuleren', 'op papier zetten', 'noteren', 'structuur', 'orde', 'ordeloosheid', 'sprongen in ruimte of tijd', 'vermenging', 'fragmentarisch', 'hoofdstukken', 'alinea\'s', 'lijnen', 'hoofdlijnen', 'zijlijntjes', 'vooruitwijzingen', 'flash-backs', 'patronen', 'perspectiefwisselingen', '\'rond\' verhaal', 'compositie', 'vervlechten', 'in elkaar zetten', 'componeren', 'verknopen', 'onderbreken', 'verbinden', 'vermengen'},
-                       '2': {'plot', 'verhaal', 'verhaaldraad', 'slot', 'ontknoping', 'historie', 'handelingen', 'episoden', 'voorvallen', 'thema', 'idee', 'probleem', 'problematiek', 'gedachte', 'romanthese', 'visie', 'inzicht'},
-                       '3': {'personages', 'figuur', 'hoofdpersoon', 'karakter', 'mens', 'tegenspeler', 'hoofdrol', 'bijrol', 'persoonlijkheid', 'sujet', 'held', 'type', 'dialoog', 'gesprek', 'woordenwisseling', 'uitspraak', 'vertellen', 'spreken'},
-                       '4': {'uitgever', 'titel', 'illustratie', 'afbeelding', 'foto', 'flaptekst', 'papier', 'verschijnen', 'presenteren'},
-                       '5': {'boek', 'werk', 'roman', 'verhaal', 'vertelling', 'deel', 'hoofdstuk', 'slot'}}
-
+def generate_featuresets(data_dict, ud_dict, we_model, urls, metadata_dict):
+    train_feats = []
+    dev_feats = []
+    test_feats = []
     aspect_dict = {'1': ['stijl', 'structuur'],
                    '2': ['plot', 'thema'],
                    '3': ['karakters', 'dialoog'],
@@ -60,6 +57,7 @@ def generate_feature_lexicon(data_dict, ud_dict, we_model):
                    '5': 'gehele werk'}
 
     for key, value in data_dict.items():
+        features = {}
         try:
             review_data = value
             pos_data = ud_dict[key]
@@ -67,51 +65,39 @@ def generate_feature_lexicon(data_dict, ud_dict, we_model):
                 similarity_scores = []
                 try:
                     if pos_data[token] in ['noun', 'adj', 'verb', 'propn', 'adp']:
-                        if token not in feature_lexicon[review_data['label1'][0]]:
-                            for aspect in aspect_dict[review_data['label1'][0]]:
-                                similarity_scores.append(we_model.wv.similarity(token, aspect))
-                                if max(similarity_scores) > 0.3:
-                                    feature_lexicon[review_data['label1'][0]].add(token)
+                        for aspect in aspect_dict[review_data['label1'][0]]:
+                            similarity_scores.append(we_model.wv.similarity(token, aspect))
+                            if max(similarity_scores) > 0.3:
+                                features[token] = True
                         else:
                             pass
                     else:
                         pass
                 except KeyError:
                     pass
+            id_match = re.match('(\d+)_', key)
+            review_url = urls[int(id_match.group(1)) + 1]
+            try:
+                nur_code = metadata_dict[review_url]['nur']
+                features[nur_code] = 'True'
+            except KeyError:
+                features['None'] = 'True'
+
+            if value['fold'] >= 1 and value['fold'] <= 8:
+                train_feats.append((features, value['label1'][0]))
+            elif value['fold'] == 9:
+                dev_feats.append((features, value['label1'][0]))
+            else:
+                test_feats.append((features, value['label1'][0]))
+
         except KeyError:
             pass
-
-    return feature_lexicon
-
-def generate_featuresets(lexicon, data_dict, urls, metadata_dict):
-    train_feats = []
-    dev_feats = []
-    test_feats = []
-    for key, value in data_dict.items():
-        features = {}
-        id_match = re.match('(\d+)_', key)
-        for token in value['sentence']:
-            if token in lexicon[value['label1'][0]]:
-                features[token] = 'True'
-        review_url = urls[int(id_match.group(1))+1]
-        try:
-            nur_code = metadata_dict[review_url]['nur']
-            features[nur_code] = 'True'
-        except KeyError:
-            features['None'] = 'True'
-
-        if value['fold'] >= 1 and value['fold'] <= 8:
-            train_feats.append((features, value['label1'][0]))
-        elif value['fold'] == 9:
-            dev_feats.append((features, value['label1'][0]))
-        else:
-            test_feats.append((features, value['label1'][0]))
 
     return train_feats, dev_feats, test_feats
 
 def classification(train_feats):
     print("##### Classifying book reviews")
-    svm_classifier = nltk.classify.SklearnClassifier(SVC(C=10, kernel='linear')).train(train_feats)
+    svm_classifier = nltk.classify.SklearnClassifier(SVC(C=0.1, kernel='linear')).train(train_feats)
     return svm_classifier
 
 def evaluation(svm_classifier, test_feats):
@@ -203,15 +189,14 @@ def main():
     print('##### Generating word embeddings')
     we_model = generate_word_embeddings()
 
-    print('##### Generating feature lexicon')
-    feature_lexicon = generate_feature_lexicon(data_dict, ud_dict, we_model)
+    print('##### Generating featuresets')
+    train_feats, dev_feats, test_feats = generate_featuresets(data_dict, ud_dict, we_model, urls, metadata_dict)
     #lexicon = {'1': {'geloofwaardigheid', 'ordeloosheid', 'technieken', 'vermengen', 'vermenging', 'plotlijn', 'vervlechten', 'op papier zetten', 'manier', 'aktie', 'benoemen', 'vocabulaire', 'hoeveelheid', 'intermezzo', 'toonzetting', 'geheel', 'bladvulling', 'penvoering', 'tijdsaanduiding', 'intelligentie', 'geneuzel', 'taalgebruik', 'betekenis', 'beschrijven', 'ruimtebeschrijvingen', 'orde', 'noteren', 'schrijfstijl', 'zinsnedes', 'onderbreken', 'hoofdstukken', 'situatiebeschrijvingen', 'ondertoon', 'smakelijk', 'materiaal', 'overgangen', 'materie', 'stijl', 'verbeelding', 'vaststelling', 'snelheid', 'vertaling', 'ingewikkelder', 'woorden/ontbrekende', 'zijl', 'uitdrukkingen', 'verhelderend', 'taalfouten', 'lectuur', 'verknopen', 'beeldspraak', 'verbinden', 'spanningsbogen', 'hoofdlijnen', 'gedachtegang', 'toelichting', 'krachttermen', 'woorden', 'schrijftechnisch', 'schrijven', 'zijlijntjes', 'fragmentarisch', 'vooruitwijzingen', 'omschrijvingen', 'structuur', 'woordkeus', 'toegankelijk', 'formuleren', 'uitwerking', 'woordenstroom', 'lijnen', "'rond' verhaal", 'verteltrant', "alinea's", 'woordgebruik', 'taalbeheersing', 'schrijfwijze', 'hoofdzakelijk', 'nadrukkelijkheid', 'ontwikkelingen', 'voetnoten', 'taalverzorging', 'woordspelingen', 'vernieuwingen', 'tekeningen', 'in elkaar zetten', 'compositie', 'toon', 'onsamenhangend', 'zinnen', 'taal', 'vertellen', 'eigenschap', 'elementen', 'verhelderen', 'verweving', 'uitweidingen', 'helderheid', 'woordkeuze', 'gebruiksvoorwerpen', 'onderbouwen', 'formuleringen', 'ogenschijnlijk', 'woordspeling', 'zinnetjes', 'voortgang', 'verhaallijn', 'weergeven', 'aaneenschakeling', 'patronen', 'sprongen in ruimte of tijd', 'perspectiefwisselingen', 'complimenten', 'managementsamenvatting', 'pretentieus', 'onoverzichtelijk', 'componeren', 'logica', 'teksten', 'vastigheid', 'opbouw', 'verhaallijnen', 'flash-backs', 'vergelijkingen', 'verteller'},
     #           '2': {'plooi', 'thema', 'episoden', 'hoofdthema', 'verhaal-idee', 'plotwending', 'verrassing', 'idee', 'thema’s', 'verrassend', 'climax', 'ontknoping', 'verhaallijn', 'onderwerp', 'onderwerpen', 'spanningsbogen', 'thematiek', 'geheel', "thema's", 'complot', 'spanning', 'plottwist', 'verhaal', 'onknoping', 'verhaaldraad', 'inzicht', 'einde', 'probleem', 'plot', 'handelingen', 'voorvallen', 'gedachte', 'cliffhanger', 'historie', 'verhaallijnen', 'misdaadverhaal', 'romanthese', 'visie', 'slot', 'problematiek', 'plotwendingen'},
     #           '3': {'verhalen', 'personeelsleden', 'mensen', 'situaties', 'vrouwen', 'krachten', 'hughes', 'ideaalbeelden', 'vlaanderen', 'mannen', 'gesprekken', 'type', 'karakter', 'trekjes', 'romanpersonage', 'edelheer', 'karikatuur', 'planten', 'bijrol', 'volgelingen', 'buren', 'redelijk', 'slechterik', 'hoofdrolspelers', 'gedachten', 'wijdelingen', 'emoties', 'hoofdpersonages', 'agnes', 'persoonlijkheid', 'hoofdrol', 'hoofdpersonen', 'vuisten', 'figuur', 'dagboekfragmenten', 'tv-persoonlijkheid', 'gedachtes', 'verhelderend', 'dantes', 'dialoog', 'vertakking', 'gebeurtenissen', 'persoonlijk', 'tegenspeler', 'hoofdfiguren', 'rustmomenten', 'spreken', 'zonen', 'rollen', 'dialogen', 'sujet', 'peeters', 'vaart', 'gevoelens', 'gesprek', 'kantelen', 'tatoeages', 'verdenkingen', 'agenten', 'typetjes', 'uiterlijk', 'dorpsgenoten', 'inzichten', 'eigenschappen', 'personage', 'uitwerpselen', 'medeleerlingen', 'sollen', 'huisgenoten', 'karel', 'dingen', 'beiden', 'personages', 'levensecht', 'held', 'karakters', 'boekpersonage', 'inhuren', 'feiten', 'subtiliteit', 'gasten', 'acties', 'woordenwisseling', 'mens', 'relaties', 'vertellen', 'redenen', 'verdachten', 'festiviteiten', 'feitelijk', 'personality', 'bijrollen', 'hoofdpersoon', 'hoofdpersonage', 'uitspraak', 'ontwikkeling', 'helderziend', 'woordenschat', 'protagonisten', 'dames', 'verhaallijn', 'kirsten', 'zussen', 'patiënten', 'bespiegelingen', 'speurders', 'geloofwaardig', 'quinten', 'aannames', 'familieleden'},
     #           '4': {'papier', 'illustratie', 'afbeelding', 'titel', 'uitgever', 'verschijnen', 'foto', 'presenteren', 'flaptekst'},
     #           '5': {'hoofdstuk', 'boek', 'deel', 'verhaal', 'vertelling', 'roman', 'werk', 'slot', 'r'}}
 
-    train_feats, dev_feats, test_feats = generate_featuresets(feature_lexicon, data_dict, urls, metadata_dict)
     model = classification(train_feats)
     evaluation(model, dev_feats)
 
