@@ -66,11 +66,13 @@ def generate_feature_lexicon(data_dict, ud_dict, we_model):
             for token in review_data['sentence']:
                 similarity_scores = []
                 try:
-                    if pos_data[token] in ['noun', 'adj', 'verb', 'propn', 'adp']:
+                    if pos_data[token] == 'propn':
+                        feature_lexicon['3'].add(token)
+                    elif pos_data[token] in ['noun', 'adj', 'verb', 'propn', 'adp']:
                         if token not in feature_lexicon[review_data['label1'][0]]:
                             for aspect in aspect_dict[review_data['label1'][0]]:
                                 similarity_scores.append(we_model.wv.similarity(token, aspect))
-                                if max(similarity_scores) > 0.3:
+                                if max(similarity_scores) > 0.7:
                                     feature_lexicon[review_data['label1'][0]].add(token)
                         else:
                             pass
@@ -92,13 +94,15 @@ def generate_featuresets(lexicon, data_dict, urls, metadata_dict):
         id_match = re.match('(\d+)_', key)
         for token in value['sentence']:
             if token in lexicon[value['label1'][0]]:
-                features[token] = 'True'
+                features[token] = 1
+            else:
+                features[token] = 0
         review_url = urls[int(id_match.group(1))+1]
         try:
             nur_code = metadata_dict[review_url]['nur']
-            features[nur_code] = 'True'
+            features['nur'] = nur_code
         except KeyError:
-            features['None'] = 'True'
+            features['nur'] = 0
 
         if value['fold'] >= 1 and value['fold'] <= 8:
             train_feats.append((features, value['label1'][0]))
@@ -111,7 +115,7 @@ def generate_featuresets(lexicon, data_dict, urls, metadata_dict):
 
 def classification(train_feats):
     print("##### Classifying book reviews")
-    svm_classifier = nltk.classify.SklearnClassifier(SVC(C=10, kernel='linear')).train(train_feats)
+    svm_classifier = nltk.classify.SklearnClassifier(SVC(C=1, kernel='linear')).train(train_feats)
     return svm_classifier
 
 def evaluation(svm_classifier, test_feats):
@@ -145,7 +149,7 @@ def evaluation(svm_classifier, test_feats):
     print(" |--------------------|--------------------|--------------------|--------------------|--------------------|")
     for category in categories:
         if precision[category] is None:
-            print(" |%-20s|%-20s|%-20s|%-20s|%-20s|" % (category, "NA", "NA", "NA", "NA"))
+            print(" |%-20s|%-20s|%-20s|%-20s|%-20s|" % (category, recall[category], "NA", recall[category], "NA"))
         else:
             try:
                 print(" |%-20s|%-20s|%-20s|%-20s|%-20s|" % (
@@ -186,7 +190,12 @@ def main():
     ud_dict, review_sentences = parse_ud(args[0])
 
     print('##### Reading in review data')
-    review_dict, data_dict = filereader.parse_review_data(args[1])
+    review_list, data_list = filereader.parse_review_data(args[1])
+    data_dict = {}
+
+    for item in data_list:
+        for key, value in item.items():
+            data_dict[key] = value
 
     with open('urls.txt', 'r', encoding='utf-8') as url_file:
         urls = []
@@ -214,6 +223,15 @@ def main():
     train_feats, dev_feats, test_feats = generate_featuresets(feature_lexicon, data_dict, urls, metadata_dict)
     model = classification(train_feats)
     evaluation(model, dev_feats)
+    counts = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+    for item in review_list:
+        for key, value in item.items():
+            try:
+                counts[value['label1'][0]] += 1
+            except IndexError:
+                pass
+
+    print(counts)
 
 if __name__ == "__main__":
     main()

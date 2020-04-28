@@ -22,21 +22,23 @@ class FileReader():
         with open(review_file, 'r', encoding='utf-8') as data_file:
             self.punct_list = ['.', ',', '?', ':', '(', ')', '!', "'", '`', '...', '``', "''", '"', "’", "”", "“", "’", "-",
                           ";", "‘", "="]
-            self.review_dict = {}
-            self.training_dict = {}
-            self.review_data = csv.DictReader(data_file, delimiter='\t')
-            for row in self.review_data:
+            self.review_list = []
+            self.training_list = []
+            self.review_data = data_file.readlines()
+            for row in self.review_data[1:]:
+                row = row.rstrip().split('\t')
                 self.token_list = []
-                self.review_sentence = row['sentence'].split()
+                self.review_sentence = row[4].split()
                 for token in self.review_sentence:
                     if token not in self.punct_list:
                         self.token_list.append(token.lower())
-                self.review_dict[row['sentid']] = {'label1': row['label1'], 'label2': row['label2'],
-                                              'label1_2': row['label1_2'], 'label2_2': row['label2_2'],
-                                              'sentence': self.token_list, 'filename': row['filename'], 'fold': row['fold']}
-                if (row['label1'] != '' and row['label2'] == '') or (row['label1'] != '' and row['label2'] == ''):
-                    self.training_dict[row['sentid']] = {'label1': row['label1'], 'label2': row['label2'],
-                                              'label1_2': row['label1_2'], 'label2_2': row['label2_2'],
-                                              'sentence': self.token_list, 'filename': row['filename'], 'fold': int(row['fold'])}
+                self.review_list.append({row[6]: {'label1': row[0], 'label2': row[1],
+                                              'label1_2': row[2], 'label2_2': row[3],
+                                              'sentence': self.token_list, 'filename': row[5], 'fold': int(row[7])}})
+                if (row[0] != '' and row[1] == '') or (row[0] != '' and row[1] == ''):
+                    self.training_list.append({row[6]: {'label1': row[0], 'label2': row[1],
+                                                      'label1_2': row[2], 'label2_2': row[3],
+                                                      'sentence': self.token_list, 'filename': row[5],
+                                                      'fold': int(row[7])}})
 
-        return self.review_dict, self.training_dict
+        return self.review_list, self.training_list

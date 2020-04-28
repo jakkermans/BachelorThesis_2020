@@ -50,6 +50,24 @@ def generate_featuresets(data_dict, ud_dict, we_model, urls, metadata_dict):
     train_feats = []
     dev_feats = []
     test_feats = []
+    feature_lexicon = {
+        '1': {'stijl', 'taal', 'toon', 'ondertoon', 'penvoering', 'zinnetjes', 'zinnen', 'toonzetting', 'woorden',
+              'woordspelingen', 'woordenstroom', 'formuleringen', 'taalgebruik', 'vocabulaire', 'verteltrant',
+              'schrijfwijze', 'taalbeheersing', 'woordkeus', 'schrijven', 'beschrijven', 'weergeven', 'vertellen',
+              'benoemen', 'formuleren', 'op papier zetten', 'noteren', 'structuur', 'orde', 'ordeloosheid',
+              'sprongen in ruimte of tijd', 'vermenging', 'fragmentarisch', 'hoofdstukken', 'alinea\'s', 'lijnen',
+              'hoofdlijnen', 'zijlijntjes', 'vooruitwijzingen', 'flash-backs', 'patronen', 'perspectiefwisselingen',
+              '\'rond\' verhaal', 'compositie', 'vervlechten', 'in elkaar zetten', 'componeren', 'verknopen',
+              'onderbreken', 'verbinden', 'vermengen'},
+        '2': {'plot', 'verhaal', 'verhaaldraad', 'slot', 'ontknoping', 'historie', 'handelingen', 'episoden',
+              'voorvallen', 'thema', 'idee', 'probleem', 'problematiek', 'gedachte', 'romanthese', 'visie', 'inzicht'},
+        '3': {'personages', 'figuur', 'hoofdpersoon', 'karakter', 'mens', 'tegenspeler', 'hoofdrol', 'bijrol',
+              'persoonlijkheid', 'sujet', 'held', 'type', 'dialoog', 'gesprek', 'woordenwisseling', 'uitspraak',
+              'vertellen', 'spreken'},
+        '4': {'uitgever', 'titel', 'illustratie', 'afbeelding', 'foto', 'flaptekst', 'papier', 'verschijnen',
+              'presenteren'},
+        '5': {'boek', 'werk', 'roman', 'verhaal', 'vertelling', 'deel', 'hoofdstuk', 'slot'}}
+
     aspect_dict = {'1': ['stijl', 'structuur'],
                    '2': ['plot', 'thema'],
                    '3': ['karakters', 'dialoog'],
@@ -57,7 +75,7 @@ def generate_featuresets(data_dict, ud_dict, we_model, urls, metadata_dict):
                    '5': 'gehele werk'}
 
     for key, value in data_dict.items():
-        features = {}
+        features = dict([(word, True) for word in feature_lexicon[value['label1'][0]]])
         try:
             review_data = value
             pos_data = ud_dict[key]
@@ -97,7 +115,7 @@ def generate_featuresets(data_dict, ud_dict, we_model, urls, metadata_dict):
 
 def classification(train_feats):
     print("##### Classifying book reviews")
-    svm_classifier = nltk.classify.SklearnClassifier(SVC(C=0.1, kernel='linear')).train(train_feats)
+    svm_classifier = nltk.classify.SklearnClassifier(SVC(C=1, kernel='linear')).train(train_feats)
     return svm_classifier
 
 def evaluation(svm_classifier, test_feats):
