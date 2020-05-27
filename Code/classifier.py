@@ -8,6 +8,7 @@ from sklearn.svm import SVC, LinearSVC
 import nltk.classify
 import collections, itertools
 from nltk.metrics import precision, recall
+from sklearn.metrics import confusion_matrix, classification_report
 
 
 def parse_ud(ud_file):
@@ -72,8 +73,68 @@ def generate_feature_lexicon(data_dict, ud_dict, we_model):
                         if token not in feature_lexicon[review_data['label1'][0]]:
                             for aspect in aspect_dict[review_data['label1'][0]]:
                                 similarity_scores.append(we_model.wv.similarity(token, aspect))
-                                if max(similarity_scores) > 0.7:
+                                if max(similarity_scores) > 0.2:
                                     feature_lexicon[review_data['label1'][0]].add(token)
+                        else:
+                            pass
+                    else:
+                        pass
+                except KeyError:
+                    pass
+        except KeyError:
+            pass
+
+    return feature_lexicon
+
+def generate_featurelexicon_memberbased(data_dict, ud_dict, we_model):
+    feature_lexicon = {
+        '1': {'stijl', 'taal', 'toon', 'ondertoon', 'penvoering', 'zinnetjes', 'zinnen', 'toonzetting', 'woorden',
+              'woordspelingen', 'woordenstroom', 'formuleringen', 'taalgebruik', 'vocabulaire', 'verteltrant',
+              'schrijfwijze', 'taalbeheersing', 'woordkeus', 'schrijven', 'beschrijven', 'weergeven', 'vertellen',
+              'benoemen', 'formuleren', 'op papier zetten', 'noteren', 'structuur', 'orde', 'ordeloosheid',
+              'sprongen in ruimte of tijd', 'vermenging', 'fragmentarisch', 'hoofdstukken', 'alinea\'s', 'lijnen',
+              'hoofdlijnen', 'zijlijntjes', 'vooruitwijzingen', 'flash-backs', 'patronen', 'perspectiefwisselingen',
+              '\'rond\' verhaal', 'compositie', 'vervlechten', 'in elkaar zetten', 'componeren', 'verknopen',
+              'onderbreken', 'verbinden', 'vermengen'},
+        '2': {'plot', 'verhaal', 'verhaaldraad', 'slot', 'ontknoping', 'historie', 'handelingen', 'episoden',
+              'voorvallen', 'thema', 'idee', 'probleem', 'problematiek', 'gedachte', 'romanthese', 'visie', 'inzicht'},
+        '3': {'personages', 'figuur', 'hoofdpersoon', 'karakter', 'mens', 'tegenspeler', 'hoofdrol', 'bijrol',
+              'persoonlijkheid', 'sujet', 'held', 'type', 'dialoog', 'gesprek', 'woordenwisseling', 'uitspraak',
+              'vertellen', 'spreken'},
+        '4': {'uitgever', 'titel', 'illustratie', 'afbeelding', 'foto', 'flaptekst', 'papier', 'verschijnen',
+              'presenteren'},
+        '5': {'boek', 'werk', 'roman', 'verhaal', 'vertelling', 'deel', 'hoofdstuk', 'slot'}}
+
+    aspect_dict = {'1': ['stijl', 'structuur'],
+                   '2': ['plot', 'thema'],
+                   '3': ['karakters', 'dialoog'],
+                   '4': 'verschijning',
+                   '5': 'gehele werk'}
+
+    member_dict = {}
+
+    for key, value in aspect_dict.items():
+        members = []
+        for aspect in value:
+            try:
+                members += [member[0] for member in we_model.wv.most_similar(aspect)][:50]
+            except IndexError:
+                members += [member[0] for member in we_model.wv.most_similar(aspect)][:len([member[0] for member in we_model.wv.most_similar(aspect)])]
+        member_dict[key] = set(members)
+
+    for key, value in data_dict.items():
+        try:
+            review_data = value
+            pos_data = ud_dict[key]
+            for token in review_data['sentence']:
+                similarity_scores = []
+                try:
+                    if pos_data[token] == 'propn':
+                        feature_lexicon['3'].add(token)
+                    elif pos_data[token] in ['noun', 'adj', 'verb', 'propn', 'adp']:
+                        if token not in feature_lexicon[review_data['label1'][0]]:
+                            if token in member_dict[review_data['label1'][0]]:
+                                feature_lexicon[review_data['label1'][0]].add(token)
                         else:
                             pass
                     else:
@@ -100,9 +161,9 @@ def generate_featuresets(lexicon, data_dict, urls, metadata_dict):
         review_url = urls[int(id_match.group(1))+1]
         try:
             nur_code = metadata_dict[review_url]['nur']
-            features['nur'] = nur_code
+            features[nur_code] = 1
         except KeyError:
-            features['nur'] = 0
+            features['None'] = 1
 
         if value['fold'] >= 1 and value['fold'] <= 8:
             train_feats.append((features, value['label1'][0]))
@@ -110,6 +171,39 @@ def generate_featuresets(lexicon, data_dict, urls, metadata_dict):
             dev_feats.append((features, value['label1'][0]))
         else:
             test_feats.append((features, value['label1'][0]))
+
+    split = int(len(train_feats) * 0.8)
+
+    return train_feats[:split], dev_feats, test_feats
+
+def generate_bow_features(data_dict, urls, metadata_dict, ud_dict):
+    train_feats = []
+    dev_feats = []
+    test_feats = []
+    for key, value in data_dict.items():
+        try:
+            features = {}
+            id_match = re.match('(\d+)_', key)
+            pos_data = ud_dict[key]
+            for word in value['sentence']:
+                if pos_data[word] in ['noun', 'adj', 'verb', 'propn', 'adp']:
+                    features[word] = 1
+                else:
+                    features[word] = 1
+            review_url = urls[int(id_match.group(1)) + 1]
+            try:
+                nur_code = metadata_dict[review_url]['nur']
+                features['nur'] = 1
+            except KeyError:
+                features['nur'] = 0
+            if value['fold'] >= 1 and value['fold'] <= 8:
+                train_feats.append((features, value['label1'][0]))
+            elif value['fold'] == 9:
+                dev_feats.append((features, value['label1'][0]))
+            else:
+                test_feats.append((features, value['label1'][0]))
+        except KeyError:
+            pass
 
     return train_feats, dev_feats, test_feats
 
@@ -214,6 +308,7 @@ def main():
 
     print('##### Generating feature lexicon')
     feature_lexicon = generate_feature_lexicon(data_dict, ud_dict, we_model)
+    #feature_lexicon = generate_featurelexicon_memberbased(data_dict, ud_dict, we_model)
     #lexicon = {'1': {'geloofwaardigheid', 'ordeloosheid', 'technieken', 'vermengen', 'vermenging', 'plotlijn', 'vervlechten', 'op papier zetten', 'manier', 'aktie', 'benoemen', 'vocabulaire', 'hoeveelheid', 'intermezzo', 'toonzetting', 'geheel', 'bladvulling', 'penvoering', 'tijdsaanduiding', 'intelligentie', 'geneuzel', 'taalgebruik', 'betekenis', 'beschrijven', 'ruimtebeschrijvingen', 'orde', 'noteren', 'schrijfstijl', 'zinsnedes', 'onderbreken', 'hoofdstukken', 'situatiebeschrijvingen', 'ondertoon', 'smakelijk', 'materiaal', 'overgangen', 'materie', 'stijl', 'verbeelding', 'vaststelling', 'snelheid', 'vertaling', 'ingewikkelder', 'woorden/ontbrekende', 'zijl', 'uitdrukkingen', 'verhelderend', 'taalfouten', 'lectuur', 'verknopen', 'beeldspraak', 'verbinden', 'spanningsbogen', 'hoofdlijnen', 'gedachtegang', 'toelichting', 'krachttermen', 'woorden', 'schrijftechnisch', 'schrijven', 'zijlijntjes', 'fragmentarisch', 'vooruitwijzingen', 'omschrijvingen', 'structuur', 'woordkeus', 'toegankelijk', 'formuleren', 'uitwerking', 'woordenstroom', 'lijnen', "'rond' verhaal", 'verteltrant', "alinea's", 'woordgebruik', 'taalbeheersing', 'schrijfwijze', 'hoofdzakelijk', 'nadrukkelijkheid', 'ontwikkelingen', 'voetnoten', 'taalverzorging', 'woordspelingen', 'vernieuwingen', 'tekeningen', 'in elkaar zetten', 'compositie', 'toon', 'onsamenhangend', 'zinnen', 'taal', 'vertellen', 'eigenschap', 'elementen', 'verhelderen', 'verweving', 'uitweidingen', 'helderheid', 'woordkeuze', 'gebruiksvoorwerpen', 'onderbouwen', 'formuleringen', 'ogenschijnlijk', 'woordspeling', 'zinnetjes', 'voortgang', 'verhaallijn', 'weergeven', 'aaneenschakeling', 'patronen', 'sprongen in ruimte of tijd', 'perspectiefwisselingen', 'complimenten', 'managementsamenvatting', 'pretentieus', 'onoverzichtelijk', 'componeren', 'logica', 'teksten', 'vastigheid', 'opbouw', 'verhaallijnen', 'flash-backs', 'vergelijkingen', 'verteller'},
     #           '2': {'plooi', 'thema', 'episoden', 'hoofdthema', 'verhaal-idee', 'plotwending', 'verrassing', 'idee', 'thema’s', 'verrassend', 'climax', 'ontknoping', 'verhaallijn', 'onderwerp', 'onderwerpen', 'spanningsbogen', 'thematiek', 'geheel', "thema's", 'complot', 'spanning', 'plottwist', 'verhaal', 'onknoping', 'verhaaldraad', 'inzicht', 'einde', 'probleem', 'plot', 'handelingen', 'voorvallen', 'gedachte', 'cliffhanger', 'historie', 'verhaallijnen', 'misdaadverhaal', 'romanthese', 'visie', 'slot', 'problematiek', 'plotwendingen'},
     #           '3': {'verhalen', 'personeelsleden', 'mensen', 'situaties', 'vrouwen', 'krachten', 'hughes', 'ideaalbeelden', 'vlaanderen', 'mannen', 'gesprekken', 'type', 'karakter', 'trekjes', 'romanpersonage', 'edelheer', 'karikatuur', 'planten', 'bijrol', 'volgelingen', 'buren', 'redelijk', 'slechterik', 'hoofdrolspelers', 'gedachten', 'wijdelingen', 'emoties', 'hoofdpersonages', 'agnes', 'persoonlijkheid', 'hoofdrol', 'hoofdpersonen', 'vuisten', 'figuur', 'dagboekfragmenten', 'tv-persoonlijkheid', 'gedachtes', 'verhelderend', 'dantes', 'dialoog', 'vertakking', 'gebeurtenissen', 'persoonlijk', 'tegenspeler', 'hoofdfiguren', 'rustmomenten', 'spreken', 'zonen', 'rollen', 'dialogen', 'sujet', 'peeters', 'vaart', 'gevoelens', 'gesprek', 'kantelen', 'tatoeages', 'verdenkingen', 'agenten', 'typetjes', 'uiterlijk', 'dorpsgenoten', 'inzichten', 'eigenschappen', 'personage', 'uitwerpselen', 'medeleerlingen', 'sollen', 'huisgenoten', 'karel', 'dingen', 'beiden', 'personages', 'levensecht', 'held', 'karakters', 'boekpersonage', 'inhuren', 'feiten', 'subtiliteit', 'gasten', 'acties', 'woordenwisseling', 'mens', 'relaties', 'vertellen', 'redenen', 'verdachten', 'festiviteiten', 'feitelijk', 'personality', 'bijrollen', 'hoofdpersoon', 'hoofdpersonage', 'uitspraak', 'ontwikkeling', 'helderziend', 'woordenschat', 'protagonisten', 'dames', 'verhaallijn', 'kirsten', 'zussen', 'patiënten', 'bespiegelingen', 'speurders', 'geloofwaardig', 'quinten', 'aannames', 'familieleden'},
@@ -221,17 +316,25 @@ def main():
     #           '5': {'hoofdstuk', 'boek', 'deel', 'verhaal', 'vertelling', 'roman', 'werk', 'slot', 'r'}}
 
     train_feats, dev_feats, test_feats = generate_featuresets(feature_lexicon, data_dict, urls, metadata_dict)
+    final_train_feats = train_feats + dev_feats
+    #train_feats, dev_feats, test_feats = generate_bow_features(data_dict, urls, metadata_dict, ud_dict)
     model = classification(train_feats)
-    evaluation(model, dev_feats)
-    counts = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
-    for item in review_list:
-        for key, value in item.items():
-            try:
-                counts[value['label1'][0]] += 1
-            except IndexError:
-                pass
 
-    print(counts)
+    y_true = [feat[1] for feat in dev_feats]
+    testing_feats = [feat[0] for feat in dev_feats]
+
+    print(confusion_matrix(y_true, model.classify_many(testing_feats)))
+    print(classification_report(y_true, model.classify_many(testing_feats), zero_division=False))
+    evaluation(model, test_feats)
+    #counts = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+    #for item in review_list:
+    #    for key, value in item.items():
+    #        try:
+    #            counts[value['label1'][0]] += 1
+    #        except IndexError:
+    #            pass
+
+    #print(counts)
 
 if __name__ == "__main__":
     main()

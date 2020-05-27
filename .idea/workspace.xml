@@ -19,10 +19,10 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="adbcaa91-c654-4c5b-8733-7ac3a65835ec" name="Default Changelist" comment="Second version of classifier created that does not use the lexicon">
+    <list default="true" id="adbcaa91-c654-4c5b-8733-7ac3a65835ec" name="Default Changelist" comment="Initial testing of classification settings">
+      <change afterPath="$PROJECT_DIR$/Code/iaa_calculator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Code/aspect_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code/aspect_classifier.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Code/classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code/classifier.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Code/file_reader/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/Code/file_reader/__init__.py" afterDir="false" />
     </list>
@@ -51,10 +51,10 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Language technology" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Code/iaa_calculator.py" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.classifier">
+  <component name="RunManager" selected="Python.iaa_calculator">
     <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="BachelorThesis_2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -121,6 +121,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="iaa_calculator" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="BachelorThesis_2020" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\Jannick Akkermans\venv\Scripts\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Code" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Code/iaa_calculator.py" />
+      <option name="PARAMETERS" value="Andreas_boris.csv" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="process_data" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="BachelorThesis_2020" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -144,6 +166,7 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="Python.iaa_calculator" />
       <item itemvalue="Python.classifier" />
       <item itemvalue="Python.process_data" />
       <item itemvalue="Python.__init__" />
@@ -190,7 +213,21 @@
       <workItem from="1588080724601" duration="516000" />
       <workItem from="1588081355567" duration="960000" />
       <workItem from="1588082789858" duration="865000" />
-      <workItem from="1588084150776" duration="1228000" />
+      <workItem from="1588084150776" duration="1287000" />
+      <workItem from="1588160294921" duration="1583000" />
+      <workItem from="1588163088867" duration="647000" />
+      <workItem from="1588164273937" duration="647000" />
+      <workItem from="1588165486143" duration="6091000" />
+      <workItem from="1588238736932" duration="823000" />
+      <workItem from="1588240146573" duration="6172000" />
+      <workItem from="1588328717170" duration="2352000" />
+      <workItem from="1588332382216" duration="10890000" />
+      <workItem from="1588592223226" duration="2302000" />
+      <workItem from="1588935187105" duration="1844000" />
+      <workItem from="1589203352620" duration="4476000" />
+      <workItem from="1590156536216" duration="249000" />
+      <workItem from="1590488109527" duration="4811000" />
+      <workItem from="1590569515056" duration="5765000" />
     </task>
     <task id="LOCAL-00001" summary="Uploading code">
       <created>1587134518422</created>
@@ -248,45 +285,46 @@
     <MESSAGE value="Improved word embeddings function to include more data" />
     <MESSAGE value="Final lexicon created and first version of classification" />
     <MESSAGE value="Second version of classifier created that does not use the lexicon" />
-    <option name="LAST_COMMIT_MESSAGE" value="Second version of classifier created that does not use the lexicon" />
+    <MESSAGE value="Initial testing of classification settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="Initial testing of classification settings" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="235" y="350" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1588074015609">
+    <state x="235" y="350" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1590574847453">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="235" y="350" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588074015609" />
-    <state x="739" y="262" key="FileChooserDialogImpl" timestamp="1587922446103">
+    <state x="235" y="350" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1590574847453" />
+    <state x="739" y="262" key="FileChooserDialogImpl" timestamp="1588592568387">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="739" y="262" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1587922446103" />
-    <state width="1877" height="278" key="GridCell.Tab.0.bottom" timestamp="1588084067512">
+    <state x="739" y="262" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1588592568387" />
+    <state width="1877" height="278" key="GridCell.Tab.0.bottom" timestamp="1590574848425">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="278" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588084067512" />
-    <state width="1877" height="278" key="GridCell.Tab.0.center" timestamp="1588084067512">
+    <state width="1877" height="278" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1590574848425" />
+    <state width="1877" height="278" key="GridCell.Tab.0.center" timestamp="1590574848425">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="278" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588084067512" />
-    <state width="1877" height="278" key="GridCell.Tab.0.left" timestamp="1588084067512">
+    <state width="1877" height="278" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1590574848425" />
+    <state width="1877" height="278" key="GridCell.Tab.0.left" timestamp="1590574848425">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="278" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588084067512" />
-    <state width="1877" height="278" key="GridCell.Tab.0.right" timestamp="1588084067512">
+    <state width="1877" height="278" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1590574848425" />
+    <state width="1877" height="278" key="GridCell.Tab.0.right" timestamp="1590574848425">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="278" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588084067512" />
+    <state width="1877" height="278" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1590574848425" />
     <state x="832" y="229" key="RollbackChangesDialog" timestamp="1587569694079">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="832" y="229" key="RollbackChangesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1587569694079" />
-    <state x="461" y="165" key="SettingsEditor" timestamp="1587642306652">
+    <state x="461" y="165" key="SettingsEditor" timestamp="1589204009026">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1587642306652" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1587739899868">
+    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1589204009026" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1588094811024">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1587739899868" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1588094811024" />
     <state x="659" y="308" key="git4idea.merge.GitPullDialog" timestamp="1587134716546">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -298,7 +336,8 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/BachelorThesis_2020$aspect_classifier.coverage" NAME="aspect_classifier Coverage Results" MODIFIED="1588063981189" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
-    <SUITE FILE_PATH="coverage/BachelorThesis_2020$classifier.coverage" NAME="classifier Coverage Results" MODIFIED="1588084169242" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
+    <SUITE FILE_PATH="coverage/BachelorThesis_2020$iaa_calculator.coverage" NAME="iaa_calculator Coverage Results" MODIFIED="1590574848419" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
+    <SUITE FILE_PATH="coverage/BachelorThesis_2020$classifier.coverage" NAME="classifier Coverage Results" MODIFIED="1590494584574" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
     <SUITE FILE_PATH="coverage/BachelorThesis_2020$process_data.coverage" NAME="process_data Coverage Results" MODIFIED="1587562208112" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code" />
     <SUITE FILE_PATH="coverage/BachelorThesis_2020$__init__.coverage" NAME="__init__ Coverage Results" MODIFIED="1587742125649" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Code/file_reader" />
   </component>
