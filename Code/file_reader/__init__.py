@@ -34,10 +34,10 @@ class FileReader():
                         self.token_list.append(token.lower())
                 self.review_list.append({row[6]: {'label1': row[0], 'label2': row[1],
                                               'label1_2': row[2], 'label2_2': row[3],
-                                              'sentence': self.token_list, 'filename': row[5]}})
+                                              'sentence': self.token_list, 'filename': row[5], 'fold': int(row[7])}})
                 if (row[0] != '' and row[1] == '') or (row[0] != '' and row[1] == ''):
                     self.training_list.append({row[6]: {'label1': row[0], 'label2': row[1],
                                                       'label1_2': row[2], 'label2_2': row[3],
-                                                      'sentence': self.token_list, 'filename': row[5]}})
+                                                      'sentence': self.token_list, 'filename': row[5], 'fold': int(row[7])}})
 
         return self.review_list, self.training_list

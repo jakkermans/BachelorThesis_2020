@@ -325,7 +325,7 @@ def main():
 
     print(confusion_matrix(y_true, model.classify_many(testing_feats)))
     print(classification_report(y_true, model.classify_many(testing_feats), zero_division=False))
-    evaluation(model, test_feats)
+    #evaluation(model, test_feats)
     #counts = {'0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
     #for item in review_list:
     #    for key, value in item.items():
